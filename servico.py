@@ -222,21 +222,22 @@ def getProjeto(id):
 	#print(ementa)
 	#print(ementa.encode('iso8859-1'))
 	#print(type(projeto.ementa))
-	saida = saida + "ementa:     " + projeto.ementa.decode('utf-8') + "<br>"
-	saida = saida + "autor:      " + projeto.autor.decode('utf-8') + "<br>"
-	saida = saida + "comissoes:  " + projeto.comissoes.decode('utf-8') + "<br>"
+	saida = saida + "ementa:     " + projeto.ementa + "<br>" #.decode('utf-8') + "<br>"
+	saida = saida + "autor:      " + projeto.autor + "<br>" #.decode('utf-8') + "<br>"
+	saida = saida + "comissoes:  " + projeto.comissoes + "<br>" # ".decode('utf-8') + "<br>"
 	saida = saida + "link notes: " + projeto.link_notes + "<br>"
 	saida = saida + "link www3:  " + projeto.link_www3 + "<br>"
 	saida = saida + "<br><br><h3>Tramitacoes</h3><hr>"
-	for t in projeto.tramitacoes:
-		#texto = t[2]
-		#data = t[3]
-		#print(texto.decode('utf-8'))
-		#print(type(texto))
-		saida = saida + "data:  " + str(t[3]) + "<br>"
-		saida = saida + "texto: " + str(t[2]) + "<br>"
-		saida = saida + "link:  " + t[0] + "<br>"
-		saida = saida + "link:  " + t[1] + "<br>"
+	#for t in projeto.tramitacoes:
+	#	#texto = t[2]
+	#	#data = t[3]
+	#	#print(texto.decode('utf-8'))
+	#	#print(type(texto))
+	for tram in projeto.tramitacoes:
+		saida = saida + "data:       " + tram.data_publicacao + "<br>"  #+ str(t[3]) + "<br>"
+		saida = saida + "texto:      " + tram.texto + "<br>" #+ str(t[2]) + "<br>"
+		saida = saida + "link notes: " + tram.link_notes + "<br>" #+ t[0] + "<br>"
+		saida = saida + "link www3:  " + tram.link_www3 + "<br>" #+ t[1] + "<br>"
 		saida = saida + "<hr>"
 	return saida
 
@@ -245,8 +246,8 @@ def getLei(id):
 	lei = buscaGeralPorLei(id)
 	saida = "<h3>Lei</h3></br>"
 	saida = saida + "Lei:     " + str(lei.id) + "<br>" + " ano " + lei.ano + "<br>"
-	saida = saida + "ementa:     " + str(lei.ementa) + "<br>"
-	saida = saida + "autoria:      " + str(lei.autoria) + "<br>"
+	saida = saida + "ementa:     " + lei.ementa + "<br>"
+	saida = saida + "autoria:      " + lei.autoria + "<br>"
 	saida = saida + "link notes: " + lei.link_notes + "<br>"
 	saida = saida + "link www3:  " + lei.link_www3 + "<br>"
 	return saida

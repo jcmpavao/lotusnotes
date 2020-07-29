@@ -11,8 +11,16 @@ from LotusNotes import LotusNotes , CodigosNotes
 
 URL_BUSCA = "http://www3.alerj.rj.gov.br/lotus_notes/consultaNotes.asp?hdfid=11&txtquery="
 URL_BUSCA_GERAL = "http://www3.alerj.rj.gov.br/lotus_notes/consultaNotes.asp?"
-URL_WWW3 ="http://www3.alerj.rj.gov.br/lotus_notes/default.asp?id=<ID>&URL="
+URL_WWW3 = "http://www3.alerj.rj.gov.br/lotus_notes/default.asp?id=<ID>&URL="
 URL_RAIZ_NOTES = "http://alerjln1.alerj.rj.gov.br"
+
+class TramitacaoNotes:
+	def __init__(self, texto = " ", data_publicacao = " " , link_notes = " " , link_www3 = " "):
+		self.texto = texto
+		self.data_publicacao = data_publicacao
+		self.link_notes = link_notes
+		self.link_www3 = link_www3
+
 class ProjetoNotes:
 	""" Point class for representing and manipulating x,y coordinates. """
 	def __init__(self,id = " " , autor = " ",ementa=" ", link_notes=" ", link_www3=" ",data_abertura=" ",comissoes=" "):
@@ -49,6 +57,7 @@ def pesquisarProcesso(projeto, soup, idW3):
 	retorno = ""
 	projeto = ProjetoNotes(projeto)
 	tramitacoes = []
+	tramits = []
 	try:
 		#print("processando")
 		i = 0
@@ -58,7 +67,7 @@ def pesquisarProcesso(projeto, soup, idW3):
 		for elem in soup.find_all('tr'):
 			linha = ""
 			colunas = len(list(elem.select('td')))
-			print(colunas)
+			#print(colunas)
 			td = elem.select('td')
 			alt1 = ""
 			alt2 = ""
@@ -98,20 +107,21 @@ def pesquisarProcesso(projeto, soup, idW3):
 						#id = td[6].a.href
 						link = td[6].a['href']
 				#if (td[6].font != None):
-						ementa = td[6].a.string.extract().encode("utf-8")
+						ementa = td[6].a.string.extract() #.encode("utf-8")
 					else:
-						link = td[6].a['href']
+						link = td[6].a['href'].string.extract()
 						del td[6].a['href']
 						del td[6].a['target']
-						ementa = td[6].a.encode('utf-8')  #str(td[6].a).replace('<a>'," ").replace("</a>", " " )
+						ementa = td[6].a #.encode('utf-8')  #str(td[6].a).replace('<a>'," ").replace("</a>", " " )
 				else:
 					ementa = "x"
 				if (td[7].font != None):
-					dataLei = td[7].font.string.extract().encode("utf-8")
+					dataLei = td[7].font.string.extract() #.encode("utf-8")
 				if(td[8].font != None):
-					autorLei = td[8].font.string.extract().encode("utf-8")
+					autorLei = td[8].font.string.extract() #.encode("utf-8")
 				if (td[9].font != None):
-					comissoes = td[9].font.string.extract().encode("utf-8")
+					comissoes = td[9].font.string.extract() #.encode("utf-8")
+				#print(link)
 				#	del td[4].font['face']
 				#	autorLei = td[4].font.string.extract()
 				#print("antes da linha")
@@ -124,23 +134,33 @@ def pesquisarProcesso(projeto, soup, idW3):
 				linkwww3 = link #link[31:]
 				#print(linkwww3)
 				www3 = convertBase64(linkwww3,idW3)
-				#print(linkwww3)
+				print(www3)
 				#retorno = link + ";" + www3 + ";" + ementa +  ";" + dataLei + ";"  + autorLei + ";" + comissoes
-				projeto = ProjetoNotes(projeto,autorLei,ementa,URL_RAIZ_NOTES+link,www3,dataLei,comissoes)
+				urlP = URL_RAIZ_NOTES+link
+				projeto = ProjetoNotes(projeto,autorLei,ementa,urlP,www3,dataLei,comissoes)
 				#print("attrib")
+				tram = TramitacaoNotes(ementa, dataLei,urlP ,www3)
+				tramits.append(tram)
 				tramitacoes.append([URL_RAIZ_NOTES+link,www3,ementa,dataLei])
 			else:
 				#print("tram")
 				linkTram = link #link[31:]
 				www3T = convertBase64(linkTram,idW3)
 				#print("attrib")
-				tramitacoes.append([URL_RAIZ_NOTES+link,www3T,ementa,dataLei])
+				urlP = URL_RAIZ_NOTES+link
+				tram = TramitacaoNotes(ementa, dataLei,urlP,www3T)
+				tramits.append(tram)
+				tramitacoes.append([urlP,www3T,ementa,dataLei])
 		#print("Total de elementos encontrados: " + str(i))
 	except:
 		print(sys.exc_info())
-	projeto.tramitacoes = tramitacoes
+	projeto.tramitacoes = tramits #tramitacoes
+	#texto = tramits[0].texto
+	#print(texto)
 	#print(projeto.tramitacoes)
 	#return  retorno
+	#print(projeto.ementa)
+	#print(tramits[0].texto)
 	return projeto
 
 def pesquisarLei(lei, soup, idW3):
@@ -167,25 +187,25 @@ def pesquisarLei(lei, soup, idW3):
 						idLei = td[2].a.string.extract()
 						link = td[2].a['href']
 				if (td[3].font != None):
-					ano = td[3].font.string.extract().encode("utf-8")
+					ano = td[3].font.string.extract() #.encode("utf-8")
 				if (td[4].font != None):
-					dataLei = td[4].font.string.extract().encode("utf-8")
+					dataLei = td[4].font.string.extract() #.encode("utf-8")
 				if (td[5].font != None):
-					ementa = td[5].font.string.extract().encode("utf-8")
+					ementa = td[5].font.string.extract() #.encode("utf-8")
 				if (td[6].font != None):
-					autoriaLei = td[6].font.string.extract().encode("utf-8")
+					autoriaLei = td[6].font.string.extract() #.encode("utf-8")
 				#	del td[4].font['face']
 				#	autorLei = td[4].font.string.extract()
 				linha = idLei + ";" + link + ";" + ";" + str(dataLei)+ ";" + str(autoriaLei) + ";" + str(ementa)  #ementa.encode('utf-8',errors="ignore")
 				#print(linha.encode("utf-8",errors="ignore"))
 			i += 1
-			linkwww3 = link[31:]
+			linkwww3 = link #link[31:]
 			#print("fim da arttrri")
 			#print(linkwww3)
 			www3 = convertBase64(linkwww3,idW3)
 			#print(linkwww3)
 			#retorno = idLei + ";" + link + ";" + www3 + ";" + str(ementa) +  ";" + dataLei + ";"  + str(autoriaLei) + ";" + ano
-			lei = LeiNotes(idLei,autoriaLei,ementa,link,www3,dataLei,ano)
+			lei = LeiNotes(idLei,autoriaLei,ementa,URL_RAIZ_NOTES+link,www3,dataLei,ano)
 		#print("Total de elementos encontrados: " + str(i))
 	except:
 		print(sys.exc_info())
@@ -201,7 +221,6 @@ def buscaLei(lei,url=" ",idW3 = 0 ):
 	result = requests.get(url)
 	src = result.content
 	soup = BeautifulSoup(src, 'lxml')
-
 	if ( soup.body.select('table') != None):
 		#print(soup.table)
 		lei = pesquisarLei(lei,soup,idW3)
@@ -224,7 +243,7 @@ def buscaProcesso(processo,url=" ", idW3 = 0):
 	result = requests.get(url)
 	#result = requests.get("http://alerjln1.alerj.rj.gov.br/ordemdia.nsf/OrdemInt?OpenForm")
 	src = result.content
-	soup = BeautifulSoup(src, 'lxml')
+	soup = BeautifulSoup(src,"lxml") # "'html.parser')
 	#print(soup.body)
 	if ( soup.body.select('table') != None):
 		#print(soup.table)
@@ -237,7 +256,8 @@ def buscaProcesso(processo,url=" ", idW3 = 0):
 def convertBase64(url, idW3):
 	global URL_WWW3
 	#print("base 64")
-	encoded = URL_WWW3.replace("<ID>",str(idW3)) +  str(base64.b64encode(url.encode()))
+	param = base64.b64encode(url.encode('utf-8')).decode('utf8')
+	encoded = URL_WWW3.replace("<ID>",str(idW3)) +  param
 	return encoded
 
 def buscaGeralPorCodigo(projeto):
@@ -341,6 +361,7 @@ def buscaGeralPorCodigo(projeto):
 	print(retorno.ementa)
 	print(retorno.link_notes)
 	print(retorno.link_www3)
+	print(str(len(retorno.tramitacoes)))
 	return retorno
 
 def buscaGeralPorLei(lei):
