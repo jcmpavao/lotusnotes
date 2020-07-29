@@ -244,9 +244,9 @@ def getProjeto(id):
 def getLei(id):
 	lei = buscaGeralPorLei(id)
 	saida = "<h3>Lei</h3></br>"
-	saida = saida + "Lei:     " + lei.id + "<br>" + " ano " + lei.ano + "<br>"
-	saida = saida + "ementa:     " + lei.ementa + "<br>"
-	saida = saida + "autoria:      " + lei.autoria + "<br>"
+	saida = saida + "Lei:     " + str(lei.id) + "<br>" + " ano " + lei.ano + "<br>"
+	saida = saida + "ementa:     " + str(lei.ementa) + "<br>"
+	saida = saida + "autoria:      " + str(lei.autoria) + "<br>"
 	saida = saida + "link notes: " + lei.link_notes + "<br>"
 	saida = saida + "link www3:  " + lei.link_www3 + "<br>"
 	return saida

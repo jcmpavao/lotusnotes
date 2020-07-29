@@ -12,7 +12,7 @@ from LotusNotes import LotusNotes , CodigosNotes
 URL_BUSCA = "http://www3.alerj.rj.gov.br/lotus_notes/consultaNotes.asp?hdfid=11&txtquery="
 URL_BUSCA_GERAL = "http://www3.alerj.rj.gov.br/lotus_notes/consultaNotes.asp?"
 URL_WWW3 ="http://www3.alerj.rj.gov.br/lotus_notes/default.asp?id=<ID>&URL="
-
+URL_RAIZ_NOTES = "http://alerjln1.alerj.rj.gov.br"
 class ProjetoNotes:
 	""" Point class for representing and manipulating x,y coordinates. """
 	def __init__(self,id = " " , autor = " ",ementa=" ", link_notes=" ", link_www3=" ",data_abertura=" ",comissoes=" "):
@@ -121,20 +121,20 @@ def pesquisarProcesso(projeto, soup, idW3):
 			if (status == "raiz"):
 				#print(buscaLei(link))
 				#print("raiz")
-				linkwww3 = link[31:]
+				linkwww3 = link #link[31:]
 				#print(linkwww3)
 				www3 = convertBase64(linkwww3,idW3)
 				#print(linkwww3)
 				#retorno = link + ";" + www3 + ";" + ementa +  ";" + dataLei + ";"  + autorLei + ";" + comissoes
-				projeto = ProjetoNotes(projeto,autorLei,ementa,link,www3,dataLei,comissoes)
+				projeto = ProjetoNotes(projeto,autorLei,ementa,URL_RAIZ_NOTES+link,www3,dataLei,comissoes)
 				#print("attrib")
-				tramitacoes.append([link,www3,ementa,dataLei])
+				tramitacoes.append([URL_RAIZ_NOTES+link,www3,ementa,dataLei])
 			else:
 				#print("tram")
-				linkTram = link[31:]
+				linkTram = link #link[31:]
 				www3T = convertBase64(linkTram,idW3)
 				#print("attrib")
-				tramitacoes.append([link,www3T,ementa,dataLei])
+				tramitacoes.append([URL_RAIZ_NOTES+link,www3T,ementa,dataLei])
 		#print("Total de elementos encontrados: " + str(i))
 	except:
 		print(sys.exc_info())
@@ -144,6 +144,7 @@ def pesquisarProcesso(projeto, soup, idW3):
 	return projeto
 
 def pesquisarLei(lei, soup, idW3):
+	print("entrou na pesquisa")
 	retorno = ""
 	lei = LeiNotes(lei)
 	try:
@@ -175,14 +176,15 @@ def pesquisarLei(lei, soup, idW3):
 					autoriaLei = td[6].font.string.extract().encode("utf-8")
 				#	del td[4].font['face']
 				#	autorLei = td[4].font.string.extract()
-				linha = idLei + ";" + link + ";" + ";" + str(dataLei)+ ";" + autoriaLei + ";" + ementa.encode('utf-8',errors="ignore")
+				linha = idLei + ";" + link + ";" + ";" + str(dataLei)+ ";" + str(autoriaLei) + ";" + str(ementa)  #ementa.encode('utf-8',errors="ignore")
 				#print(linha.encode("utf-8",errors="ignore"))
 			i += 1
 			linkwww3 = link[31:]
+			#print("fim da arttrri")
 			#print(linkwww3)
 			www3 = convertBase64(linkwww3,idW3)
 			#print(linkwww3)
-			retorno = idLei + ";" + link + ";" + www3 + ";" + ementa +  ";" + dataLei + ";"  + autoriaLei + ";" + ano
+			#retorno = idLei + ";" + link + ";" + www3 + ";" + str(ementa) +  ";" + dataLei + ";"  + str(autoriaLei) + ";" + ano
 			lei = LeiNotes(idLei,autoriaLei,ementa,link,www3,dataLei,ano)
 		#print("Total de elementos encontrados: " + str(i))
 	except:
@@ -195,7 +197,7 @@ def buscaLei(lei,url=" ",idW3 = 0 ):
 		url = URL_BUSCA+lei
 	else:
 		url = url + lei
-	print(url)
+	print("vai buscar em " + url)
 	result = requests.get(url)
 	src = result.content
 	soup = BeautifulSoup(src, 'lxml')
@@ -218,7 +220,7 @@ def buscaProcesso(processo,url=" ", idW3 = 0):
 		url = URL_BUSCA+processo
 	else:
 		url = url + processo
-	#print("antes requests")
+	print("vai executar requests em " + url)
 	result = requests.get(url)
 	#result = requests.get("http://alerjln1.alerj.rj.gov.br/ordemdia.nsf/OrdemInt?OpenForm")
 	src = result.content
@@ -240,11 +242,22 @@ def convertBase64(url, idW3):
 
 def buscaGeralPorCodigo(projeto):
 	retorno = ProjetoNotes()
-	if (len(projeto) == 11):
-		ano, tema,proj_lei = int(projeto[:4]),projeto[4:6],projeto[6:]
+	print (projeto + " len" + str(len(projeto)))
+	if ( len(projeto) >= 8 ):
+		if ( len(projeto) == 11):
+			ano, tema,proj_lei = int(projeto[:4]),projeto[4:6],projeto[6:]
+		elif ( len(projeto) == 9):
+			ano, tema, proj_lei = int(projeto[:2]) ,projeto[2:4],projeto[4:]
+			if ( ano in [1,2,3]):
+				ano = 2000 + ano
+			else:
+				ano = 1900 + ano
+			ano = int(ano)
+		#ano, tema,proj_lei = int(projeto[:4]),projeto[4:6],projeto[6:]
 		url = ""
 		hdfid = 0
 		idWww3 = 0
+		urlBusca = ""
 		if ( tema in CodigosNotes.codigos):
 			print("Assunto da busca: " + CodigosNotes.codigos[tema])
 			print("Numero: " + proj_lei + " do ano " + str(ano))
@@ -252,52 +265,61 @@ def buscaGeralPorCodigo(projeto):
 			#LotusNotes.imprimirLinks()
 			#LotusNotes.imprimirBancos()
 			#projetos de Lei, definir qual o banco$
-			if (ano in list(range(1991,1994))):
+			if (ano in list(range(1991,1995))):
 				url = URL_BUSCA_GERAL  + "hdfid=" + LotusNotes.links["Processo Leg. 1991/1994"][0]
 				hdfid = LotusNotes.links["Processo Leg. 1991/1994"][0]
 				idWww3 = LotusNotes.links["Processo Leg. 1991/1994"][2]
+				urlBusca = LotusNotes.links["Processo Leg. 1991/1994"][1]
 				#print("8")
-			elif (ano in list(range(1995,1998))):
+			elif (ano in list(range(1995,1999))):
 				url = URL_BUSCA_GERAL  + "hdfid=" + LotusNotes.links["Processo Leg. 1995/1998"][0]
 				hdfid = LotusNotes.links["Processo Leg. 1995/1998"][0]
 				idWww3 = LotusNotes.links["Processo Leg. 1995/1998"][2]
+				urlBusca = LotusNotes.links["Processo Leg. 1995/1998"][1]
 				#print("8")
 			elif (ano in list(range(1999,2003))):
 				url = URL_BUSCA_GERAL  + "hdfid=" + LotusNotes.links["Processo Leg. 1999/2003"][0]
 				hdfid = LotusNotes.links["Processo Leg. 1999/2003"][0]
 				idWww3 = LotusNotes.links["Processo Leg. 1999/2003"][2]
+				urlBusca = LotusNotes.links["Processo Leg. 1999/2003"][1]
 				#print("8")
 			elif (ano in list(range(2003,2007))):
 				url = URL_BUSCA_GERAL  + "hdfid=" + LotusNotes.links["Processo Leg. 2003/2007"][0]
 				hdfid = LotusNotes.links["Processo Leg. 2003/2007"][0]
 				idWww3 = LotusNotes.links["Processo Leg. 2003/2007"][2]
+				urlBusca = LotusNotes.links["Processo Leg. 2003/2007"][1]
 				#print("8")
 			elif (ano in list(range(2007,2011))):
 				url = URL_BUSCA_GERAL + "hdfid=" + LotusNotes.links["Processo Leg. 2007/2011"][0]
 				hdfid = LotusNotes.links["Processo Leg. 2007/2011"][0]
 				idWww3 = LotusNotes.links["Processo Leg. 2007/2011"][2]
+				urlBusca = LotusNotes.links["Processo Leg. 2007/2011"][1]
 				#print("9")
 			elif (ano in list(range(2011,2015))):
 				url = URL_BUSCA_GERAL + "hdfid=" + LotusNotes.links["Processo Leg. 2011/2015"][0]
 				hdfid = LotusNotes.links["Processo Leg. 2011/2015"][0]
 				idWww3 = LotusNotes.links["Processo Leg. 2011/2015"][2]
+				urlBusca = LotusNotes.links["Processo Leg. 2011/2015"][1]
 				#print("10")
 			elif (ano in list(range(2015,2019))):
 				url = URL_BUSCA_GERAL + "hdfid=" + LotusNotes.links["Processo Leg. 2015/2019"][0]
 				hdfid = LotusNotes.links["Processo Leg. 2015/2019"][0]
 				idWww3 = LotusNotes.links["Processo Leg. 2015/2019"][2]
+				urlBusca = LotusNotes.links["Processo Leg. 2015/2019"][1]
 				#print("11")
 			elif (ano in list(range(2019,2023))):
 				url = URL_BUSCA_GERAL + "hdfid=" + LotusNotes.links["Processo Leg. 2019/2023"][0]
 				hdfid = LotusNotes.links["Processo Leg. 2019/2023"][0]
 				idWww3 = LotusNotes.links["Processo Leg. 2019/2023"][2]
+				urlBusca = LotusNotes.links["Processo Leg. 2019/2023"][1]
 				#print("12")
 		else:
 			print("tema " + tema + "invalido")
 		if(url != ""):
-			#print(hdfid)
+			print(urlBusca)
 			#print(projeto)
-			Projeto = buscaProcesso(projeto,url+"&txtquery=",idWww3)
+			#Projeto = buscaProcesso(projeto,url+"&txtquery=",idWww3)
+			Projeto = buscaProcesso(projeto,urlBusca,idWww3)
 			#print(Projeto)
 			if(Projeto.autor != " "):
 				#print("prim")
@@ -309,12 +331,16 @@ def buscaGeralPorCodigo(projeto):
 					#print("sec")
 					hdfid = str(int(hdfid) - 1)
 					#print(hdfid)
-					url = URL_BUSCA_GERAL + "hdfid=" + hdfid + "&txtquery="
-					Projeto = buscaProcesso(projeto,url,idWww3)
+					#url = URL_BUSCA_GERAL + "hdfid=" + hdfid + "&txtquery="
+					Projeto = buscaProcesso(projeto,urlBusca,idWww3)
+					#Projeto = buscaProcesso(projeto,url,idWww3)
 					retorno = Projeto
 		else:
 			print("banco nao encontrado")
 
+	print(retorno.ementa)
+	print(retorno.link_notes)
+	print(retorno.link_www3)
 	return retorno
 
 def buscaGeralPorLei(lei):
@@ -330,9 +356,10 @@ def buscaGeralPorLei(lei):
 		w3Id = LotusNotes.links["Legislacao"][2]
 		if(url != ""):
 			#print(hdfid)
-			#print(url)
-			url = URL_BUSCA_GERAL + "hdfid=" + hdfid + "&txtquery="
-			Lei = buscaLei(id_lei,url,w3Id)
+			print(url)
+			#url = URL_BUSCA_GERAL + "hdfid=" + hdfid + "&txtquery="
+			#url = url +  ano + "&" + id_lei
+			Lei = buscaLei(id_lei+"&"+ano,url,w3Id)
 			#print(Projeto)
 			if(Lei.autoria != " "):
 				#print("prim")
@@ -342,6 +369,10 @@ def buscaGeralPorLei(lei):
 		else:
 			print("banco nao encontrado")
 
+	print(retorno.ementa)
+	print(retorno.autoria)
+	print(retorno.link_notes)
+	print(retorno.link_www3)
 	return retorno
 	
 def main(processo,url= " " ):
@@ -352,10 +383,13 @@ def main(processo,url= " " ):
 
 if __name__ == '__main__':
 	processo = sys.argv[1]
-	#print(processo)
+	tipo = sys.argv[2]
+	print(tipo)
 	#main(processo,URL_BUSCA)
 	#main(processo)
-	buscaGeralPorCodigo(processo)
-	#buscaGeralPorLei(processo)
+	if ( int(tipo) == 1):
+		buscaGeralPorCodigo(processo)
+	else:
+		buscaGeralPorLei(processo)
 #testeRetirar()
 #teste()
