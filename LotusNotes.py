@@ -48,7 +48,7 @@ class LotusNotesHREFs():
                                 with open(self.lista_links, 'r') as f:
                                         for linha in f.readlines():
                                                 campo = linha.replace('\n','').replace('\ufeff','').split(';')
-                                                self.links[campo[1]] = [ campo[0] ,  campo[2] ,campo[3] ]
+                                                self.links[campo[1]] = [ campo[0] ,  campo[2] ,campo[3], int(campo[4]) ]
                                 retorno = ( len(self.links)> 0 )
                         except:
                                 print(str(sys.exc_info()))
@@ -56,7 +56,13 @@ class LotusNotesHREFs():
                     print("sem banco")
 
                 return retorno
-                #print("fim da carga de classificacao e regressao")
+        def primeiraUltimaLeg(self):
+            lista = []
+            for b in self.links:
+                if(self.links[b][3] > 0 ):
+                     lista.append(self.links[b][3])
+            return {"primeira" : min(lista) , "ultima" : max(lista)}
+            
         def imprimirBancos(self):
                 for b in self.links:
                     print(b)
@@ -64,7 +70,71 @@ class LotusNotesHREFs():
         def imprimirLinks(self):
                 for l in self.links:
                     print(self.links[l][1])
+        
+        def obterLinkPorLeg(self,leg):
+            retorno = ""
+            for b in self.links:
+                 if ( self.links[b][3] == leg):
+                        retorno = self.links[b][1]
+                        break
+            return retorno            
 
+        def obterLinkIdPorLeg(self,leg):
+            retorno = {"id" : 0 , "link" : "" , "idWWW" : "" , "leg" : 0}
+            for b in self.links:
+                 if ( self.links[b][3] == leg):
+                        retorno["id"] = self.links[b][0]
+                        retorno["idWWW"] = self.links[b][2]
+                        retorno["link"] = self.links[b][1]
+                        retorno["leg"] = self.links[b][3]
+                        break
+            return retorno   
+
+        def obterLinkIdPorAno(self,ano):
+            retorno = {"id" : 0 , "link" : "" , "idWWW" : "" , "leg" : 0}
+            if (ano in range(1991,1995)):
+                retorno["id"] = self.links["Processo Leg. 1991/1994"][0]
+                retorno["link"] = self.links["Processo Leg. 1991/1994"][1]                
+                retorno["idWWW"] = self.links["Processo Leg. 1991/1994"][2]
+                retorno["leg"] = self.links["Processo Leg. 1991/1994"][3]                
+            elif (ano in range(1995,1999)):
+                retorno["id"] = self.links["Processo Leg. 1995/1998"][0]
+                retorno["link"] = self.links["Processo Leg. 1995/1998"][1]  
+                retorno["idWWW"] = self.links["Processo Leg. 1995/1998"][2]
+                retorno["leg"] = self.links["Processo Leg. 1995/1998"][3]                
+            elif (ano in range(1999,2003)):
+                retorno["id"] = self.links["Processo Leg. 1999/2003"][0]
+                retorno["link"] = self.links["Processo Leg. 1999/2003"][1]  
+                retorno["idWWW"] = self.links["Processo Leg. 1999/2003"][2]
+                retorno["leg"] = self.links["Processo Leg. 1999/2003"][3]  
+            elif (ano in range(2003,2007)):
+                retorno["id"] = self.links["Processo Leg. 2003/2007"][0]
+                retorno["link"] = self.links["Processo Leg. 2003/2007"][1]  
+                retorno["idWWW"] = self.links["Processo Leg. 2003/2007"][2]
+                retorno["leg"] = self.links["Processo Leg. 2003/2007"][3]  
+            elif (ano in range(2007,2011)):
+                retorno["id"] = self.links["Processo Leg. 2007/2011"][0]
+                retorno["link"] = self.links["Processo Leg. 2007/2011"][1]  
+                retorno["idWWW"] = self.links["Processo Leg. 2007/2011"][2]
+                retorno["leg"] = self.links["Processo Leg. 2007/2011"][3]  
+            elif (ano in range(2011,2015)):
+                retorno["id"] = self.links["Processo Leg. 2011/2015"][0]
+                retorno["link"] = self.links["Processo Leg. 2011/2015"][1]  
+                retorno["idWWW"] = self.links["Processo Leg. 2011/2015"][2]
+                retorno["leg"] = self.links["Processo Leg. 2011/2015"][3]  
+            elif (ano in range(2015,2019)):
+                retorno["id"] = self.links["Processo Leg. 2015/2019"][0]
+                retorno["link"] = self.links["Processo Leg. 2015/2019"][1]  
+                retorno["idWWW"] = self.links["Processo Leg. 2015/2019"][2]
+                retorno["leg"] = self.links["Processo Leg. 2015/2019"][3]  
+            elif (ano in range(2019,2023)):
+                retorno["id"] = self.links["Processo Leg. 2019/2023"][0]
+                retorno["link"] = self.links["Processo Leg. 2019/2023"][1]  
+                retorno["idWWW"] = self.links["Processo Leg. 2019/2023"][2]
+                retorno["leg"] = self.links["Processo Leg. 2019/2023"][3]  
+ 
+            return retorno  
+        
         def imprimirIDs(self):
                 for l in self.links:
                     print(self.links[l][0])
