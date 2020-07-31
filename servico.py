@@ -245,7 +245,7 @@ def getProjeto(id):
 def getLei(id):
 	lei = buscaGeralPorLei(id)
 	saida = "<h3>Lei</h3></br>"
-	saida = saida + "Lei:     " + str(lei.id) + "<br>" + " ano " + lei.ano + "<br>"
+	saida = saida + "Lei:     " + str(lei.id) + "<br>" + " ano " + str(lei.ano) + "<br>"
 	saida = saida + "ementa:     " + lei.ementa + "<br>"
 	saida = saida + "autoria:      " + lei.autoria + "<br>"
 	saida = saida + "link notes: " + lei.link_notes + "<br>"
@@ -254,5 +254,5 @@ def getLei(id):
 
 
 if __name__ == "__main__":
-	port = int(os.environ.get("PORT", 5001))
-	app.run(host='0.0.0.0', port=port)
+	port = int(os.environ.get("PORT", 5000))
+	app.run(host='192.168.5.66', port=port)
