@@ -59,7 +59,7 @@ def pesquisarProcesso(projeto, soup, idW3):
 	tramitacoes = []
 	tramits = []
 	try:
-		#print("processando")
+		print("processando")
 		i = 0
 		fim = len(list(soup.find_all('tr')))
 		#link = ""
@@ -109,10 +109,10 @@ def pesquisarProcesso(projeto, soup, idW3):
 				#if (td[6].font != None):
 						ementa = td[6].a.string.extract() #.encode("utf-8")
 					else:
-						link = td[6].a['href'].string.extract()
+						link = td[6].a['href'] #.string.extract()
 						del td[6].a['href']
 						del td[6].a['target']
-						ementa = td[6].a #.encode('utf-8')  #str(td[6].a).replace('<a>'," ").replace("</a>", " " )
+						ementa = str(td[6].a) #.encode('utf-8')  #str(td[6].a).replace('<a>'," ").replace("</a>", " " )
 				else:
 					ementa = "x"
 				if (td[7].font != None):
@@ -130,7 +130,7 @@ def pesquisarProcesso(projeto, soup, idW3):
 			i += 1
 			if (status == "raiz"):
 				#print(buscaLei(link))
-				#print("raiz")
+				print("raiz")
 				linkwww3 = link #link[31:]
 				#print(linkwww3)
 				www3 = convertBase64(linkwww3,idW3)
@@ -143,7 +143,7 @@ def pesquisarProcesso(projeto, soup, idW3):
 				tramits.append(tram)
 				tramitacoes.append([URL_RAIZ_NOTES+link,www3,ementa,dataLei])
 			else:
-				#print("tram")
+				print("tram " + str(dataLei))
 				linkTram = link #link[31:]
 				www3T = convertBase64(linkTram,idW3)
 				#print("attrib")
