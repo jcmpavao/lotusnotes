@@ -33,7 +33,44 @@ class CodigosLotusNotes():
             for c in self.codigos:
                 print(c)
 
+class LeisLotusNotes():
+    def __init__(self, arquivo_leis="contlei.data"):
+        self.carregad0 = False
+        self.lista_leis = os.path.abspath(os.getcwd()) + "/" + arquivo_leis
+        self.leis = {}
+        self.carregado = self.carregarLeis()
+    def carregarLeis(self):
+        retorno = False
+        #print(self.lista_links)
+        if ( os.path.isfile(self.lista_leis)):
+            try:
+                print("inicio carregamento")
+                with open(self.lista_leis, 'r') as f:
+                    for linha in f.readlines():
+                        campo = linha.replace('\n','').replace('\ufeff','').split(';')
+                        chave = str(campo[1]) + str(campo[0]).zfill(6)
+                        try:
+                            self.leis[chave] = [ int(campo[0]) , int(campo[1]),  campo[2] ,campo[3], campo[4], campo[5] ]
+                        except:
+                            print("erro chave : " + chave + " " + str(sys.exc_info()))
+                retorno = ( len(self.leis) > 0 )
+            except:
+                print(str(sys.exc_info()))
+        else:
+            print("sem banco")
+        return retorno
+    def localizarLeiPorAnoCodigo(self,ano, codigo):
+        retorno = []
+        chave = str(ano) + str(codigo).zfill(6)
+        if ( chave in self.leis.keys()):
+            retorno = self.leis[chave]
+        return retorno
 
+    def imprimirLeis(self):
+        for b in self.leis:
+            print(b)
+    def totalLeis(self):
+        return len(self.leis.keys())
 class LotusNotesHREFs():
         def __init__(self, arquivo_links="BancosNotes.data"):
                 self.carregado = False
@@ -141,6 +178,7 @@ class LotusNotesHREFs():
 
 LotusNotes = LotusNotesHREFs()
 CodigosNotes = CodigosLotusNotes()
+LeisNotes = LeisLotusNotes()
 if __name__ == "__main__":
 	Lt = LotusNotesHREFs()
 	if ( Lt.carregado):

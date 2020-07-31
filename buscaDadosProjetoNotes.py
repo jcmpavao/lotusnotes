@@ -7,7 +7,7 @@ import os
 from bs4 import BeautifulSoup
 import time
 import base64
-from LotusNotes import LotusNotes , CodigosNotes
+from LotusNotes import LotusNotes , CodigosNotes , LeisNotes
 
 URL_BUSCA = "http://www3.alerj.rj.gov.br/lotus_notes/consultaNotes.asp?hdfid=11&txtquery="
 URL_BUSCA_GERAL = "http://www3.alerj.rj.gov.br/lotus_notes/consultaNotes.asp?"
@@ -90,7 +90,7 @@ def pesquisarProcesso(projeto, soup, idW3):
 					tipo = "L"
 					status = "lei"
 				if ( td[4].img != None):
-#alt2 = td[4].img.alt
+					#alt2 = td[4].img.alt
 					#if ( alt2 == "Red right arrow Icon"):
 					#print("raiz")
 					tipo = "R"
@@ -367,25 +367,60 @@ def buscaGeralPorLei(lei):
 		ano, id_lei = lei.split(";")[0],lei.split(";")[1]
 		url = ""
 		hdfid = 0
-		print("Assunto da busca: Legislacao")
-		print("Numero: " + id_lei + " do ano " + str(ano))
-		hdfid = LotusNotes.links["Legislacao"][0]
-		url = LotusNotes.links["Legislacao"][1]
-		w3Id = LotusNotes.links["Legislacao"][2]
-		if(url != ""):
-			#print(hdfid)
-			print(url)
-			#url = URL_BUSCA_GERAL + "hdfid=" + hdfid + "&txtquery="
-			#url = url +  ano + "&" + id_lei
-			Lei = buscaLei(id_lei+"&"+ano,url,w3Id)
-			#print(Projeto)
-			if(Lei.autoria != " "):
-				#print("prim")
-				#print(len(Lei.autoria))
-				#print(Lei.ementa)
-				retorno = Lei
+		if (LeisNotes.carregado):
+			print("buscar no banco local")
+			leiBanco = LeisNotes.localizarLeiPorAnoCodigo(ano,id_lei)
+			print(leiBanco)
+			if(leiBanco[1] > 0):
+				print("achou local")
+				ano = leiBanco[1]
+				lei = leiBanco[0]
+				urlNotes = URL_RAIZ_NOTES +"/" + leiBanco[2]
+				ementa = leiBanco[4]
+				autoria = leiBanco[5]
+				hdfid = LotusNotes.links["Legislacao"][0]
+				w3Id = LotusNotes.links["Legislacao"][2]
+				urlW3 = convertBase64(leiBanco[2],w3Id)
+				retorno = LeiNotes(autoria,ementa, urlNotes, urlW3 ," ",ano)
+			else:
+				print("nao achuo local")
+				print("Assunto da busca: Legislacao")
+				print("Numero: " + id_lei + " do ano " + str(ano))
+				hdfid = LotusNotes.links["Legislacao"][0]
+				url = LotusNotes.links["Legislacao"][1]
+				w3Id = LotusNotes.links["Legislacao"][2]
+				if(url != ""):
+					#print(hdfid)
+					print(url)
+					#url = URL_BUSCA_GERAL + "hdfid=" + hdfid + "&txtquery="
+					#url = url +  ano + "&" + id_lei
+					Lei = buscaLei(id_lei+"&"+ano,url,w3Id)
+					#print(Projeto)
+					if(Lei.autoria != " "):
+						#print("prim")
+						#print(len(Lei.autoria))
+						#print(Lei.ementa)
+						retorno = Lei
 		else:
-			print("banco nao encontrado")
+			print("Assunto da busca: Legislacao")
+			print("Numero: " + id_lei + " do ano " + str(ano))
+			hdfid = LotusNotes.links["Legislacao"][0]
+			url = LotusNotes.links["Legislacao"][1]
+			w3Id = LotusNotes.links["Legislacao"][2]
+			if(url != ""):
+				#print(hdfid)
+				print(url)
+				#url = URL_BUSCA_GERAL + "hdfid=" + hdfid + "&txtquery="
+				#url = url +  ano + "&" + id_lei
+				Lei = buscaLei(id_lei+"&"+ano,url,w3Id)
+				#print(Projeto)
+				if(Lei.autoria != " "):
+					#print("prim")
+					#print(len(Lei.autoria))
+					#print(Lei.ementa)
+					retorno = Lei
+			else:
+				print("banco nao encontrado")
 
 	print(retorno.ementa)
 	print(retorno.autoria)
