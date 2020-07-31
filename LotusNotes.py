@@ -50,7 +50,7 @@ class LeisLotusNotes():
                         campo = linha.replace('\n','').replace('\ufeff','').split(';')
                         chave = str(campo[1]) + str(campo[0]).zfill(6)
                         try:
-                            self.leis[chave] = [ int(campo[0]) , int(campo[1]),  campo[2] ,campo[3], campo[4], campo[5] ]
+                            self.leis[chave] = { "lei" : int(campo[0]) , "ano" : int(campo[1]), "url": campo[2] ,"status" : campo[3], "ementa" : campo[4], "autoria" : campo[5] }
                         except:
                             print("erro chave : " + chave + " " + str(sys.exc_info()))
                 retorno = ( len(self.leis) > 0 )
@@ -60,7 +60,7 @@ class LeisLotusNotes():
             print("sem banco")
         return retorno
     def localizarLeiPorAnoCodigo(self,ano, codigo):
-        retorno = []
+        retorno = {}
         chave = str(ano) + str(codigo).zfill(6)
         if ( chave in self.leis.keys()):
             retorno = self.leis[chave]

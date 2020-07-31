@@ -371,17 +371,18 @@ def buscaGeralPorLei(lei):
 			print("buscar no banco local")
 			leiBanco = LeisNotes.localizarLeiPorAnoCodigo(ano,id_lei)
 			print(leiBanco)
-			if(leiBanco[1] > 0):
+			if(leiBanco["ano"] > 0):
 				print("achou local")
-				ano = leiBanco[1]
-				lei = leiBanco[0]
-				urlNotes = URL_RAIZ_NOTES +"/" + leiBanco[2]
-				ementa = leiBanco[4]
-				autoria = leiBanco[5]
+				ano = leiBanco["ano"]
+				lei = leiBanco["lei"]
+				urlNotes = URL_RAIZ_NOTES + leiBanco["url"]
+				ementa = leiBanco["ementa"]
+				autoria = leiBanco["autoria"]
 				hdfid = LotusNotes.links["Legislacao"][0]
 				w3Id = LotusNotes.links["Legislacao"][2]
-				urlW3 = convertBase64(leiBanco[2],w3Id)
-				retorno = LeiNotes(autoria,ementa, urlNotes, urlW3 ," ",ano)
+				w3 = leiBanco["url"]
+				urlW3 = convertBase64(w3,w3Id)
+				retorno = LeiNotes(lei,autoria,ementa, urlNotes, urlW3 ," ",ano)
 			else:
 				print("nao achuo local")
 				print("Assunto da busca: Legislacao")
@@ -422,10 +423,10 @@ def buscaGeralPorLei(lei):
 			else:
 				print("banco nao encontrado")
 
-	print(retorno.ementa)
-	print(retorno.autoria)
-	print(retorno.link_notes)
-	print(retorno.link_www3)
+	print("ementa: " + retorno.ementa)
+	print("autoria: " + retorno.autoria)
+	print("link notes: " + retorno.link_notes)
+	print("link www: " + retorno.link_www3)
 	return retorno
 	
 def main(processo,url= " " ):
