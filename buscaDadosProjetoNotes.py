@@ -384,7 +384,7 @@ def buscaGeralPorLei(lei):
 				urlW3 = convertBase64(w3,w3Id)
 				retorno = LeiNotes(lei,autoria,ementa, urlNotes, urlW3 ," ",ano)
 			else:
-				print("nao achuo local")
+				print("nao achou local")
 				print("Assunto da busca: Legislacao")
 				print("Numero: " + id_lei + " do ano " + str(ano))
 				hdfid = LotusNotes.links["Legislacao"][0]

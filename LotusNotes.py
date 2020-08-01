@@ -60,7 +60,7 @@ class LeisLotusNotes():
             print("sem banco")
         return retorno
     def localizarLeiPorAnoCodigo(self,ano, codigo):
-        retorno = {}
+        retorno = {"lei" : 0, "ano" : 0}
         chave = str(ano) + str(codigo).zfill(6)
         if ( chave in self.leis.keys()):
             retorno = self.leis[chave]
