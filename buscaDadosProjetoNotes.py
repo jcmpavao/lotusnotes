@@ -36,7 +36,7 @@ class ProjetoNotes:
 
 class LeiNotes:
 	""" Point class for representing and manipulating x,y coordinates. """
-	def __init__(self,id = " " , autoria = " ",ementa=" ", link_notes=" ", link_www3=" ",data_publicacao=" ",ano=" "):
+	def __init__(self,id = " " , autoria = " ",ementa=" ", link_notes=" ", link_www3=" ",data_publicacao=" ",ano=" ", status="---"):
 		""" Create a new point at the origin """
 		self.id = id
 		self.autoria = autoria
@@ -45,7 +45,7 @@ class LeiNotes:
 		self.link_www3 = link_www3
 		self.data_publicacao = data_publicacao
 		self.ano = ano
-		#self.tramitacoes = []
+		self.status = status
 
 def listarTramitacoes(soupTR):
 	tramit = []
@@ -381,8 +381,9 @@ def buscaGeralPorLei(lei):
 				hdfid = LotusNotes.links["Legislacao"][0]
 				w3Id = LotusNotes.links["Legislacao"][2]
 				w3 = leiBanco["url"]
+				st = leiBanco["status"]
 				urlW3 = convertBase64(w3,w3Id)
-				retorno = LeiNotes(lei,autoria,ementa, urlNotes, urlW3 ," ",ano)
+				retorno = LeiNotes(lei,autoria,ementa, urlNotes, urlW3 ," ",ano,st)
 			else:
 				print("nao achou local")
 				print("Assunto da busca: Legislacao")
