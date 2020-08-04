@@ -8,7 +8,7 @@ import threading
 from threading import Thread
 #import comtypes.client
 from buscaDadosProjetoNotes import buscaProcesso, buscaGeralPorCodigo,buscaGeralPorLei, ProjetoNotes
-
+from OrdemDia import OrdemDia
 #possiveis status do processamento
 listaStatus = [{ "id" : 0 , "mensagem" : "Erro" } , { "id" : 1 , "mensagem" : "Aguardando" } ,
 { "id" : 2 , "mensagem" : "Em Processamento" }, { "id" : 3 , "mensagem" : "Finalizado" } ]
@@ -253,7 +253,18 @@ def getLei(id):
 	saida = saida + "link www3:  " + lei.link_www3 + "<br>"
 	return saida
 
-
+@app.route('/ordemdia/<anomes>')
+def listarOrdem(anomes):
+	retorno = ""
+	try:
+		ano = anomes.split(";")[0]
+		mes = anomes.split(";")[1]
+		ord = OrdemDia.listarOrdemPorAnoMes(ano,mes)
+		retorno = str(ord)
+	except:
+		retorno = str(sys.exc_info())
+	return retorno
+	
 if __name__ == "__main__":
 	port = int(os.environ.get("PORT", 5000))
 	app.run(host='0.0.0.0', port=port)
