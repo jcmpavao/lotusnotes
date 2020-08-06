@@ -253,14 +253,39 @@ def getLei(id):
 	saida = saida + "link www3:  " + lei.link_www3 + "<br>"
 	return saida
 
-@app.route('/ordemdia/<anomes>')
-def listarOrdem(anomes):
+@app.route('/ordemdia/<anomesdia>')
+def listarOrdem(anomesdia):
 	retorno = ""
 	try:
-		ano = anomes.split(";")[0]
-		mes = anomes.split(";")[1]
-		ord = OrdemDia.listarOrdemPorAnoMes(ano,mes)
+		if (len(anomesdia.split(";")) > 2):
+			ord = OrdemDia.localizarOrdemPorData(anomesdia)
+		else:
+			ano = anomesdia.split(";")[0]
+			mes = anomesdia.split(";")[1]
+			ord = OrdemDia.listarOrdemPorAnoMes(ano,mes)
 		retorno = str(ord)
+	except:
+		retorno = str(sys.exc_info())
+	return retorno
+	
+@app.route('/ordemdiasessoes/<anomesdiasessao>')
+def listarSessao(anomesdiasessao):
+	retorno = ""
+	try:
+		print(anomesdiasessao)
+		if (len(anomesdiasessao.split(";")) > 3):
+			sessao = int(anomesdiasessao.split(";")[3])
+			data = anomesdiasessao.split(";")[0] + ";" + anomesdiasessao.split(";")[1] + ";" + anomesdiasessao.split(";")[2]
+			#print(data)
+			ord = OrdemDia.localizarOrdemPorData(data)
+			#print(ord)
+			if (ord != None):
+				total = ord["total"]
+				url = ord["sessao"][total - sessao]["link"]
+				print(url)
+				retorno = OrdemDia.obterConteudoSessao(url)               
+		else:
+			retorno = ""
 	except:
 		retorno = str(sys.exc_info())
 	return retorno

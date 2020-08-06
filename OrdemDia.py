@@ -1,6 +1,9 @@
 import os
 from os import path
 import sys
+import requests
+from bs4 import BeautifulSoup
+import time
 
 class OrdemDiaLotusNotes():
     def __init__(self, arquivo_ordens="ordemdia.data"):
@@ -38,9 +41,22 @@ class OrdemDiaLotusNotes():
         else:
             print("sem banco")
         return retorno
+    def obterConteudoSessao(self, url):
+        retorno = ""
+        try:
+            result =  requests.get(url.lstrip().rstrip())
+            soup = BeautifulSoup(result.content,'lxml')
+            ancoras = soup.find_all("a")
+            for an in ancoras:
+                del an["href"]
+                #an["href"] = self.urlRaiz + an["href"].string
+            retorno = str(soup.body) #.get_text()
+        except:
+            retorno = str(sys.exc_info())
+        return retorno
     def localizarOrdemPorData(self,data):
         retorno = []
-        chave = data.split("/")[2] + data.split("/")[1] + data.split("/")[0]
+        chave = data.split(";")[0] + data.split(";")[1] + data.split(";")[2]
         if ( chave in self.ordens.keys()):
             retorno = self.ordens[chave]
         return retorno
