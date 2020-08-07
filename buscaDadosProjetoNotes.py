@@ -163,13 +163,15 @@ def pesquisarProcesso(projeto, soup, idW3):
 	#print(tramits[0].texto)
 	return projeto
 
-def pesquisarLei(lei, soup, idW3):
-	print("entrou na pesquisa")
+def pesquisarLei(leiano, soup, idW3):
+	print("entrou na pesquisa " + str(leiano))
 	retorno = ""
-	lei = LeiNotes(lei)
+	lei = LeiNotes(leiano)
 	try:
 		i = 0
 		fim = len(list(soup.find_all('tr')))
+		#if ( fim > 1):
+		#	print("achou " + str(fim) + " linhas")
 		for elem in soup.find_all('tr'):
 			linha = ""
 			colunas = len(list(elem.select('td')))
@@ -188,25 +190,37 @@ def pesquisarLei(lei, soup, idW3):
 						link = td[2].a['href']
 				if (td[3].font != None):
 					ano = td[3].font.string.extract() #.encode("utf-8")
-				if (td[4].font != None):
-					dataLei = td[4].font.string.extract() #.encode("utf-8")
-				if (td[5].font != None):
-					ementa = td[5].font.string.extract() #.encode("utf-8")
-				if (td[6].font != None):
-					autoriaLei = td[6].font.string.extract() #.encode("utf-8")
-				#	del td[4].font['face']
-				#	autorLei = td[4].font.string.extract()
-				linha = idLei + ";" + link + ";" + ";" + str(dataLei)+ ";" + str(autoriaLei) + ";" + str(ementa)  #ementa.encode('utf-8',errors="ignore")
-				#print(linha.encode("utf-8",errors="ignore"))
-			i += 1
-			linkwww3 = link #link[31:]
-			#print("fim da arttrri")
-			#print(linkwww3)
-			www3 = convertBase64(linkwww3,idW3)
-			#print(linkwww3)
-			#retorno = idLei + ";" + link + ";" + www3 + ";" + str(ementa) +  ";" + dataLei + ";"  + str(autoriaLei) + ";" + ano
-			lei = LeiNotes(idLei,autoriaLei,ementa,URL_RAIZ_NOTES+link,www3,dataLei,ano)
-		#print("Total de elementos encontrados: " + str(i))
+				#print("ano " + str(ano) + " lei " + str(idLei))
+				anoL, leiL = leiano.split("&")[1] , leiano.split("&")[0]
+				try:
+					anoI = int(ano)
+					leiI = int(idLei)
+				except:
+					ano, idLei = -1,-1
+				if (( int(anoL) == int(ano)) and ( int(leiL) == int(idLei) ) ):
+					if (td[4].font != None):
+						dataLei = td[4].font.string.extract() #.encode("utf-8")
+					if (td[5].font != None):
+						if (td[5].font.string != None): 
+							ementa = td[5].font.string.extract() #.encode("utf-8")
+						else: 
+							ementa = td[5].font.get_text() #.encode("utf-8")
+					if (td[6].font != None):
+						autoriaLei = td[6].font.string.extract() #.encode("utf-8")
+					#	del td[4].font['face']
+					#	autorLei = td[4].font.string.extract()
+					linha = idLei + ";" + link + ";" + ";" + str(dataLei)+ ";" + str(autoriaLei) + ";" + str(ementa)  #ementa.encode('utf-8',errors="ignore")
+					#print(linha.encode("utf-8",errors="ignore"))
+					i += 1
+					linkwww3 = link #link[31:]
+					#print("fim da arttrri")
+					#print(linkwww3)
+					www3 = convertBase64(linkwww3,idW3)
+					#print(linkwww3)
+					#retorno = idLei + ";" + link + ";" + www3 + ";" + str(ementa) +  ";" + dataLei + ";"  + str(autoriaLei) + ";" + ano
+					lei = LeiNotes(idLei,autoriaLei,ementa,URL_RAIZ_NOTES+link,www3,dataLei,ano)
+					break
+            #print("Total de elementos encontrados: " + str(i))
 	except:
 		print(sys.exc_info())
 	return lei
