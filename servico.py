@@ -10,7 +10,7 @@ from threading import Thread
 from buscaDadosProjetoNotes import buscaProcesso, buscaGeralPorCodigo,buscaGeralPorLei, ProjetoNotes
 from OrdemDia import OrdemDia
 #biblioteca do Jorge
-from Gera_ordem_dia import main
+#from Gera_ordem_dia import main
 
 #possiveis status do processamento
 listaStatus = [{ "id" : 0 , "mensagem" : "Erro" } , { "id" : 1 , "mensagem" : "Aguardando" } ,
@@ -89,12 +89,12 @@ class ProcessamentoDoc(Thread):
 		global STATUS
 		print("inicio")
 		STATUS.alterarStatus(2)
-		arq = main("upload/" + STATUS.arquivo_recebido,STATUS.id_processamento)
-		print(arq)
-		STATUS.arquivos_processados = arq
-		#time.sleep(20)
-		#STATUS.copiarRenomear(True)
-		#STATUS.gerarPDF()
+		#arq = main("upload/" + STATUS.arquivo_recebido,STATUS.id_processamento)
+		#print(arq)
+		#STATUS.arquivos_processados = arq
+		time.sleep(20)
+		STATUS.copiarRenomear(True)
+		STATUS.gerarPDF()
 		STATUS.alterarStatus(3)
 		print("fim")
 
