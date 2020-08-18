@@ -9,6 +9,9 @@ from threading import Thread
 #import comtypes.client
 from buscaDadosProjetoNotes import buscaProcesso, buscaGeralPorCodigo,buscaGeralPorLei, ProjetoNotes
 from OrdemDia import OrdemDia
+#biblioteca do Jorge
+from Gera_ordem_dia import main
+
 #possiveis status do processamento
 listaStatus = [{ "id" : 0 , "mensagem" : "Erro" } , { "id" : 1 , "mensagem" : "Aguardando" } ,
 { "id" : 2 , "mensagem" : "Em Processamento" }, { "id" : 3 , "mensagem" : "Finalizado" } ]
@@ -21,11 +24,11 @@ class StatusProcessamento():
 	def __init__(self, listastatus):
 		self.listastatus = listastatus
 		self.alterarStatus(1)
-
+		self.id_processamento = ""
 	def limparArquivos(self):
 		self.arquivo_recebido = ""
 		self.arquivos_processados = []
-
+		self.id_processamento = ""
 	def alterarStatus(self,id,mensagem=""):
 		self.status = self.listastatus[id]["id"]
 		if(mensagem !=""):
@@ -86,9 +89,12 @@ class ProcessamentoDoc(Thread):
 		global STATUS
 		print("inicio")
 		STATUS.alterarStatus(2)
-		time.sleep(20)
-		STATUS.copiarRenomear(True)
-		STATUS.gerarPDF()
+		arq = main("upload/" + STATUS.arquivo_recebido,STATUS.id_processamento)
+		print(arq)
+		STATUS.arquivos_processados = arq
+		#time.sleep(20)
+		#STATUS.copiarRenomear(True)
+		#STATUS.gerarPDF()
 		STATUS.alterarStatus(3)
 		print("fim")
 
@@ -122,6 +128,31 @@ def status():
 def index():
 	global STATUS
 	return jsonify(STATUS.asDictionary())
+
+@app.route('/pesquisar')
+def form_pesq():
+	return render_template('post.html')
+
+@app.route('/pesquisarlei', methods = ['POST'])
+def post_lei():
+	global STATUS
+	retorno = " "
+	try:
+		if request.method == 'POST':
+			lei = request.form.get('lei')
+			ano = request.form.get('ano')
+			lei = buscaGeralPorLei(str(ano)+";"+str(lei))
+			retorno = {"ementa" : lei.ementa }
+		else:
+			retorno = STATUS.asDictionary()
+	except:
+		mensagem = str(sys.exc_info())
+		STATUS.status = 0
+		STATUS.mensagem = mensagem
+		print(mensagem)
+		retorno = STATUS.asDictionary()
+	return jsonify(retorno)
+
 
 @app.route("/uploadTeste")
 def on_upload():
@@ -181,6 +212,7 @@ def upload_file():
 							num = int(palavra[5:11])
 						except:
 							raise ValueError("Numero " + palavra[5:11] + " invalido")
+					STATUS.id_processamento = palavra[5:11]
 					f.save("upload/"+f.filename)
 					STATUS.arquivo_recebido = f.filename
 					STATUS.alterarStatus(2)
