@@ -16,6 +16,7 @@ from OrdemDia import OrdemDia
 listaStatus = [{ "id" : 0 , "mensagem" : "Erro" } , { "id" : 1 , "mensagem" : "Aguardando" } ,
 { "id" : 2 , "mensagem" : "Em Processamento" }, { "id" : 3 , "mensagem" : "Finalizado" } ]
 
+VERSAO="1.0.0"
 
 class StatusProcessamento():
 #Classe que controla o andamento do processamento
@@ -123,6 +124,12 @@ CORS(app)
 def status():
 	global STATUS
 	return jsonify(STATUS.asDictionary())
+
+@app.route("/versao")
+def status():
+	global VERSAO
+	retorno = {"versao": VERSAO}
+	return jsonify(retorno)
 
 @app.route("/status")
 def index():
