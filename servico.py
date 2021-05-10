@@ -126,7 +126,7 @@ def status():
 	return jsonify(STATUS.asDictionary())
 
 @app.route("/versao")
-def status():
+def versao():
 	global VERSAO
 	retorno = {"versao": VERSAO}
 	return jsonify(retorno)
